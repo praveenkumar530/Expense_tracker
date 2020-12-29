@@ -12,7 +12,15 @@ hr {
   padding: 0;
 }
 
-body{
+body {
   width: 98%;
-  margin:auto;
+  margin: auto;
+}
+
+td {
+  white-space: normal !important;
+  word-wrap: break-word;
+}
+table {
+  table-layout: fixed;
 }

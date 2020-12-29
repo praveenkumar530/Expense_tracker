@@ -1,16 +1,32 @@
 import "./App.css";
 import { useEffect, useState } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faRupeeSign } from "@fortawesome/free-solid-svg-icons";
 import { getLSIncome, getLSAllExpenses } from "./localstorage";
+import ExpenseTable from "./component/expenseTable";
+import ShowExpensenRemainingDetails from "./component/ShowExpensenRemainingDetails";
+import FormControl from "./component/FormControl";
+import IncomeControl from "./component/IncomeControl";
 
 function App() {
   const [income, setIncome] = useState(getLSIncome);
   const [expenseName, setExpenseName] = useState("");
-  const [expenseAmount, setexpenseAmount] = useState();
+  const [expenseAmount, setexpenseAmount] = useState(0);
   const [allExpenses, setAllExpenses] = useState(getLSAllExpenses);
   const [totalExpense, setTotalExpense] = useState(0);
   const [totalRemaining, settotalRemaining] = useState(0);
+  const months = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
 
   function setINcomeHandler(e) {
     setIncome(e.target.value);
@@ -28,9 +44,25 @@ function App() {
   }, [allExpenses, income]);
 
   function mySubmitHandler(e) {
-    let newExpenses = [...allExpenses, { expenseName, expenseAmount }];
+    let today = new Date();
+    let dateField = today.getDate() + "-" + months[today.getMonth()];
+
+    //Unique key for storing the data in rows
+    let uniqueKey = Math.floor(
+      window.performance.now() + window.performance.timeOrigin
+    );
+
+    let newExpenses = [
+      ...allExpenses,
+      { uniqueKey, dateField, expenseName, expenseAmount },
+    ];
+    
+    //Sorting all the expenses by descending order i.e wrt latest item 
+    newExpenses.sort((x, y) => y.uniqueKey - x.uniqueKey);
+
     localStorage.setItem("LSAllExpenses", JSON.stringify(newExpenses));
     setAllExpenses(newExpenses);
+
     e.preventDefault();
     e.target.reset();
   }
@@ -39,6 +71,9 @@ function App() {
     setAllExpenses([]);
     setExpenseName("");
     setexpenseAmount("");
+    setIncome("");
+    settotalRemaining(0);
+    localStorage.setItem("lsIncome", "");
     localStorage.setItem("LSAllExpenses", []);
   }
 
@@ -46,111 +81,45 @@ function App() {
     setExpenseName(e.target.value);
   }
 
+  function setExpenseAmountHandler(e) {
+    setexpenseAmount(e.target.value);
+  }
+
+  function deleteButtonClickHandler(deletingUniqueKey) {
+    let newl = allExpenses.filter(
+      (item) => item.uniqueKey !== deletingUniqueKey
+    );
+
+    setAllExpenses(newl);
+    localStorage.setItem("LSAllExpenses", JSON.stringify(newl));
+  }
+
   return (
     <div className="App bg-light">
-      <h1 className="text-info"> EXPENSE TRACKER</h1>
-      <hr />
-      <b className="h4">
-        Income(
-        <FontAwesomeIcon icon={faRupeeSign} size="xs" />
-        ):{" "}
-      </b>
-      <input
-        type="text"
-        pattern="[0-9]*"
-        value={income}
-        className=" col-sm-6 form-control-sm border border-success "
-        required
-        onChange={setINcomeHandler}
-      ></input>
-
+      <IncomeControl income={income} setINcomeHandler={setINcomeHandler} />
       <hr className="m-1 text-white" />
-
-      {/* expencse inputs===================================================================================================  */}
-
-      <form onSubmit={mySubmitHandler}>
-        <div className="form-group row">
-          <label
-            htmlFor="colFormLabelSm"
-            className="col-sm-5 col-form-label col-form-label-sm  "
-          >
-            Expense Name:
-          </label>
-          <div className="col-sm-3">
-            <input
-              type="text"
-              className="form-control form-control-sm border border-success "
-              id="colFormLabelSm"
-              placeholder="Expense name"
-              value={expenseName}
-              required
-              onChange={setExpenseNameHandler}
-            />
-          </div>
-        </div>
-        <div className="form-group row">
-          <label
-            htmlFor="colFormLabel"
-            className="col-sm-5 col-form-label col-form-label-sm "
-          >
-            Expense Amount (<FontAwesomeIcon icon={faRupeeSign} />) :
-          </label>
-          <div className="col-sm-3">
-            <input
-              type="text"
-              className="form-control form-control-sm border border-success"
-              id="colFormLabel"
-              value={expenseAmount}
-              pattern="[0-9]*"
-              required
-              onChange={(e) => setexpenseAmount(e.target.value)}
-              placeholder="Expense Amount"
-            />
-          </div>
-        </div>
-        <div className="form-group row">
-          <input
-            type="submit"
-            className="btn btn-success col-6 mx-auto col-sm-2"
-          />
-        </div>
-      </form>
+      <FormControl
+        expenseAmount={expenseAmount}
+        expenseName={expenseName}
+        mySubmitHandler={mySubmitHandler}
+        setExpenseNameHandler={setExpenseNameHandler}
+        setExpenseAmountHandler={setExpenseAmountHandler}
+      />
       <hr className="m-1 text-white" />
-
-      <div className="mb-1">
-        <h2 className="float-lg-left m-1 form-control-lg ml-2">
-          Total Expense Amount : {totalExpense}
-        </h2>
-        <h2 className="float-lg-right m-1 form-control-lg ml-2 mb-xs-1">
-          Remaining Amount : {totalRemaining}
-        </h2>
-      </div>
+      <ShowExpensenRemainingDetails
+        totalExpense={totalExpense}
+        totalRemaining={totalRemaining}
+      />
       <br />
+      <ExpenseTable
+        allExpenses={allExpenses}
+        deleteButtonClickHandler={deleteButtonClickHandler}
+      />
 
-      <div className="mt-2">
-        <table className="table table-striped ">
-          <thead>
-            <tr>
-              <th scope="col">Sl No</th>
-              <th scope="col">Expense Name</th>
-              <th scope="col">Cost</th>
-            </tr>
-          </thead>
-          <tbody>
-            {allExpenses.map((item, index) => (
-              <tr key={index + 1}>
-                <th scope="col">{index + 1}</th>
-                <td>{item.expenseName}</td>
-                <td>{parseInt(item.expenseAmount)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
       <div>
         <button className="btn btn-danger m-1" onClick={resetExpenses}>
           Reset Expenses
-        </button>{" "}
+        </button>
       </div>
     </div>
   );
