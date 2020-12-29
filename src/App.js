@@ -1,20 +1,8 @@
 import "./App.css";
 import { useEffect, useState } from "react";
-
-function getLSIncome() {
-  let income = localStorage.getItem("lsIncome");
-  if (income) {
-    return income;
-  }
-}
-
-function getLSAllExpenses() {
-  let LSAllExpenses = localStorage.getItem("LSAllExpenses");
-  if (LSAllExpenses) {
-    return JSON.parse(LSAllExpenses);
-  }
-  return [];
-}
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faRupeeSign } from "@fortawesome/free-solid-svg-icons";
+import { getLSIncome, getLSAllExpenses } from "./localstorage";
 
 function App() {
   const [income, setIncome] = useState(getLSIncome);
@@ -31,7 +19,7 @@ function App() {
   }
 
   useEffect(() => {
-    setexpenseAmount();
+    setexpenseAmount("");
     setExpenseName("");
     let arrayNums = allExpenses.map((item) => parseInt(item.expenseAmount));
     let totalExpenseLocal = arrayNums.reduce((x, y) => x + y, 0);
@@ -41,25 +29,35 @@ function App() {
 
   function mySubmitHandler(e) {
     let newExpenses = [...allExpenses, { expenseName, expenseAmount }];
-    setAllExpenses(newExpenses);
-
     localStorage.setItem("LSAllExpenses", JSON.stringify(newExpenses));
-
+    setAllExpenses(newExpenses);
     e.preventDefault();
     e.target.reset();
   }
+
   function resetExpenses() {
     setAllExpenses([]);
+    setExpenseName("");
+    setexpenseAmount("");
     localStorage.setItem("LSAllExpenses", []);
+  }
+
+  function setExpenseNameHandler(e) {
+    setExpenseName(e.target.value);
   }
 
   return (
     <div className="App bg-light">
       <h1 className="text-info"> EXPENSE TRACKER</h1>
       <hr />
-      <b className="h4">Income: </b>
+      <b className="h4">
+        Income(
+        <FontAwesomeIcon icon={faRupeeSign} size="xs" />
+        ):{" "}
+      </b>
       <input
         type="text"
+        pattern="[0-9]*"
         value={income}
         className=" col-sm-6 form-control-sm border border-success "
         required
@@ -84,8 +82,9 @@ function App() {
               className="form-control form-control-sm border border-success "
               id="colFormLabelSm"
               placeholder="Expense name"
+              value={expenseName}
               required
-              onChange={(e) => setExpenseName(e.target.value)}
+              onChange={setExpenseNameHandler}
             />
           </div>
         </div>
@@ -94,13 +93,15 @@ function App() {
             htmlFor="colFormLabel"
             className="col-sm-5 col-form-label col-form-label-sm "
           >
-            Expense Amount:
+            Expense Amount (<FontAwesomeIcon icon={faRupeeSign} />) :
           </label>
           <div className="col-sm-3">
             <input
               type="text"
               className="form-control form-control-sm border border-success"
               id="colFormLabel"
+              value={expenseAmount}
+              pattern="[0-9]*"
               required
               onChange={(e) => setexpenseAmount(e.target.value)}
               placeholder="Expense Amount"
@@ -124,7 +125,7 @@ function App() {
           Remaining Amount : {totalRemaining}
         </h2>
       </div>
-      <br/>
+      <br />
 
       <div className="mt-2">
         <table className="table table-striped ">
@@ -140,7 +141,7 @@ function App() {
               <tr key={index + 1}>
                 <th scope="col">{index + 1}</th>
                 <td>{item.expenseName}</td>
-                <td>{item.expenseAmount}</td>
+                <td>{parseInt(item.expenseAmount)}</td>
               </tr>
             ))}
           </tbody>
