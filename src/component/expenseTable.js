@@ -8,22 +8,25 @@ function ExpenseTable({ allExpenses, deleteButtonClickHandler }) {
       <table className="table table-striped ">
         <thead>
           <tr>
-            <th scope="col" className="col-sm-2">
+            <th scope="col" className="w-35">
               Date
             </th>
-            <th scope="col" className="col-sm-4">
+            <th scope="col" className="w-26">
               Name
             </th>
-            <th scope="col" className="col-sm-4">
+            <th scope="col" className="w-22">
               Cost
             </th>
-            <th scope="col" className="col-sm-2"></th>
+            <th scope="col" className="pr-3">Action</th>
           </tr>
         </thead>
         <tbody>
           {allExpenses.map((item, index) => (
             <tr key={item.uniqueKey}>
-              <td>{item.dateField}</td>
+              <td>
+                {item.dateField}
+                <small>{item.strTime}</small>
+              </td>
               <td>{item.expenseName}</td>
               <td>{parseInt(item.expenseAmount)}</td>
               <td>

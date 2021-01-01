@@ -18,6 +18,7 @@ function FormControl({ expenseName, expenseAmount, mySubmitHandler, setExpenseNa
             className="form-control form-control-sm border border-success "
             id="colFormLabelSm"
             placeholder="Expense name"
+            autoComplete="off"
             value={expenseName}
             required
             onChange={setExpenseNameHandler}
@@ -37,6 +38,7 @@ function FormControl({ expenseName, expenseAmount, mySubmitHandler, setExpenseNa
             className="form-control form-control-sm border border-success"
             id="colFormLabel"
             value={expenseAmount}
+            autoComplete="off"
             pattern="[0-9]*"
             required
             onChange={setExpenseAmountHandler}

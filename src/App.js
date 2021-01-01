@@ -47,6 +47,12 @@ function App() {
     let today = new Date();
     let dateField = today.getDate() + "-" + months[today.getMonth()];
 
+    //Time calculation
+    var hours = today.getHours();
+    var ampm = hours >= 12 ? "pm" : "am";
+    hours = hours % 12;
+    var strTime = `(${hours}-${ampm})`;
+
     //Unique key for storing the data in rows
     let uniqueKey = Math.floor(
       window.performance.now() + window.performance.timeOrigin
@@ -54,10 +60,10 @@ function App() {
 
     let newExpenses = [
       ...allExpenses,
-      { uniqueKey, dateField, expenseName, expenseAmount },
+      { uniqueKey, strTime, dateField, expenseName, expenseAmount },
     ];
-    
-    //Sorting all the expenses by descending order i.e wrt latest item 
+
+    //Sorting all the expenses by descending order i.e wrt latest item
     newExpenses.sort((x, y) => y.uniqueKey - x.uniqueKey);
 
     localStorage.setItem("LSAllExpenses", JSON.stringify(newExpenses));
@@ -68,13 +74,15 @@ function App() {
   }
 
   function resetExpenses() {
-    setAllExpenses([]);
-    setExpenseName("");
-    setexpenseAmount("");
-    setIncome("");
-    settotalRemaining(0);
-    localStorage.setItem("lsIncome", "");
-    localStorage.setItem("LSAllExpenses", []);
+    if (window.confirm("Are you sure ? This will clear all the records !!")) {
+      setAllExpenses([]);
+      setExpenseName("");
+      setexpenseAmount("");
+      setIncome("");
+      settotalRemaining(0);
+      localStorage.setItem("lsIncome", "");
+      localStorage.setItem("LSAllExpenses", []);
+    }
   }
 
   function setExpenseNameHandler(e) {
@@ -117,8 +125,8 @@ function App() {
       />
 
       <div>
-        <button className="btn btn-danger m-1" onClick={resetExpenses}>
-          Reset Expenses
+        <button className="btn btn-danger mb-5" onClick={resetExpenses}>
+          Clear Expenses
         </button>
       </div>
     </div>

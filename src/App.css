@@ -1,6 +1,5 @@
 .App {
   text-align: center;
-  border: 2px solid green;
 }
 
 hr {
@@ -13,8 +12,11 @@ hr {
 }
 
 body {
-  width: 98%;
-  margin: auto;
+  margin: 0%;
+  padding: 0%;
+  width: 100%;
+  left: 0;
+  top: 0;
 }
 
 td {
@@ -24,3 +26,21 @@ td {
 table {
   table-layout: fixed;
 }
+
+.w-35{
+  width: 35%;
+  box-sizing: border-box;
+}
+
+
+.w-26{
+  width: 26%;
+  box-sizing: border-box;
+}
+
+
+.w-22{
+  width: 22%;
+  box-sizing: border-box;
+}
+
